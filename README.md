@@ -2,51 +2,72 @@ from flask import Flask, render_template_string, request, redirect, url_for
 
 app = Flask(__name__)
 
-# 더미 블로그 글
 posts = {
-    1: {"title": "첫 번째 글", "content": "이것은 첫 번째 블로그 글입니다.", "comments": []},
-    2: {"title": "두 번째 글", "content": "이것은 두 번째 블로그 글입니다.", "comments": []}
+    1: {"title": "사진 속 고양이", "content": "귀엽죠? 🐱", "comments": []}
 }
 
-# 템플릿 (Jinja2)
-template_post_list = '''
-<h2>블로그 글 목록</h2>
-<ul>
-    {% for pid, post in posts.items() %}
-        <li><a href="{{ url_for('post_detail', post_id=pid) }}">{{ post.title }}</a></li>
-    {% endfor %}
-</ul>
-'''
-
+# HTML 템플릿
 template_post_detail = '''
-<h2>{{ post.title }}</h2>
-<p>{{ post.content }}</p>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ post.title }}</title>
+    <style>
+        body { font-family: Arial; margin: 0; padding: 0; }
+        .post-container { padding: 20px; }
+        .comments { margin-top: 20px; }
+        .comment { padding: 5px 0; border-bottom: 1px solid #eee; }
+        .comment-input { 
+            position: fixed; bottom: 0; left: 0; right: 0; 
+            padding: 10px; 
+            border-top: 1px solid #ccc; 
+            background: #fafafa;
+            display: flex;
+        }
+        .comment-input input[type=text] {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            outline: none;
+            font-size: 14px;
+        }
+        .comment-input button {
+            margin-left: 10px;
+            padding: 10px 20px;
+            border: none;
+            background-color: #3897f0;
+            color: white;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="post-container">
+        <h2>{{ post.title }}</h2>
+        <p>{{ post.content }}</p>
 
-<h3>댓글</h3>
-<ul>
-    {% for c in post.comments %}
-        <li>{{ c }}</li>
-    {% endfor %}
-</ul>
+        <div class="comments">
+            {% for c in post.comments %}
+                <div class="comment">{{ c }}</div>
+            {% endfor %}
+        </div>
+    </div>
 
-<form method="POST">
-    <input type="text" name="comment" placeholder="댓글 입력" required>
-    <button type="submit">작성</button>
-</form>
-
-<p><a href="{{ url_for('post_list') }}">← 목록으로</a></p>
+    <form class="comment-input" method="POST">
+        <input type="text" name="comment" placeholder="댓글 달기..." required autocomplete="off">
+        <button type="submit">게시</button>
+    </form>
+</body>
+</html>
 '''
-
-# 라우터
-@app.route('/')
-def post_list():
-    return render_template_string(template_post_list, posts=posts)
 
 @app.route('/post/<int:post_id>', methods=['GET', 'POST'])
 def post_detail(post_id):
     post = posts.get(post_id)
     if not post:
-        return "존재하지 않는 글입니다.", 404
+        return "글을 찾을 수 없습니다.", 404
     if request.method == 'POST':
         comment = request.form['comment']
         post['comments'].append(comment)
