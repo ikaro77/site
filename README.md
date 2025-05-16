@@ -2,8 +2,13 @@ from flask import Flask, render_template_string, request, redirect, url_for
 
 app = Flask(__name__)
 
+# 블로그 글 데이터
 posts = {
-    1: {"title": "사진 속 고양이", "content": "귀엽죠? 🐱", "comments": []}
+    1: {
+        "title": "사진 속 고양이",
+        "content": "귀엽죠? 🐱",
+        "comments": []
+    }
 }
 
 # HTML 템플릿
@@ -17,10 +22,13 @@ template_post_detail = '''
         .post-container { padding: 20px; }
         .comments { margin-top: 20px; }
         .comment { padding: 5px 0; border-bottom: 1px solid #eee; }
-        .comment-input { 
-            position: fixed; bottom: 0; left: 0; right: 0; 
-            padding: 10px; 
-            border-top: 1px solid #ccc; 
+        .comment-input {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 10px;
+            border-top: 1px solid #ccc;
             background: #fafafa;
             display: flex;
         }
@@ -63,6 +71,7 @@ template_post_detail = '''
 </html>
 '''
 
+# 라우트
 @app.route('/post/<int:post_id>', methods=['GET', 'POST'])
 def post_detail(post_id):
     post = posts.get(post_id)
@@ -74,5 +83,6 @@ def post_detail(post_id):
         return redirect(url_for('post_detail', post_id=post_id))
     return render_template_string(template_post_detail, post=post)
 
+# 실행
 if __name__ == '__main__':
     app.run(debug=True)
